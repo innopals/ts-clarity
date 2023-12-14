@@ -1,0 +1,48 @@
+{
+  "name": "ts-clarity",
+  "description": "TypeScript runtime SDK for Clarity ABIs on Stacks",
+  "version": "0.0.11",
+  "license": "MIT",
+  "repository": "innopals/ts-clarity",
+  "scripts": {
+    "build": "pnpm run clean && pnpm run build:cjs && pnpm run build:esm+types",
+    "build:cjs": "tsc --project tsconfig.build.json --module commonjs --moduleResolution node10 --outDir ./dist/cjs --removeComments --verbatimModuleSyntax false && echo > ./dist/cjs/package.json '{\"type\":\"commonjs\"}'",
+    "build:esm+types": "tsc --project tsconfig.build.json --outDir ./dist/esm --declaration --declarationMap --declarationDir ./dist/types && echo > ./dist/esm/package.json '{\"type\":\"module\",\"sideEffects\":false}'",
+    "clean": "rimraf dist tsconfig.tsbuildinfo",
+    "test:build": "publint --strict",
+    "typecheck": "tsc --noEmit"
+  },
+  "files": [
+    "dist",
+    "!dist/**/*.tsbuildinfo",
+    "src/**/*.ts",
+    "!src/**/*.test.ts",
+    "!src/**/*.test-d.ts",
+    "!src/**/*.bench.ts"
+  ],
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "typings": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "default": "./dist/cjs/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "@stacks/stacks-blockchain-api-types": "^7.3.6",
+    "@stacks/transactions": "^6.11.0",
+    "clarity-abi": "^0.0.10",
+    "cross-fetch": "^4.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  },
+  "contributors": ["bestmike007 <bestmike007@gmail.com>"],
+  "keywords": ["abi", "clarity", "stacks", "typescript", "sdk", "web3"]
+}

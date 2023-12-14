@@ -1,0 +1,58 @@
+{
+  "name": "@ts-clarity/root",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "bench": "vitest bench -c ./packages/ts-clarity/test/vitest.config.ts",
+    "build": "pnpm run --r --filter \"./packages/**\" build",
+    "clean": "pnpm run --r --parallel clean",
+    "deps": "pnpx taze -r",
+    "format": "biome format . --write",
+    "lint": "biome check .",
+    "lint:fix": "pnpm lint --apply",
+    "lint:unused": "pnpm clean && knip",
+    "prepare": "npx simple-git-hooks",
+    "prepublishOnly": "tsc && node build/formatPackageJson.js",
+    "test": "vitest -c ./packages/ts-clarity/test/vitest.config.ts",
+    "test:build": "pnpm run --r --parallel test:build",
+    "test:cov": "vitest run --coverage -c ./packages/ts-clarity/test/vitest.config.ts",
+    "test:typecheck": "vitest typecheck -c ./packages/ts-clarity/test/vitest.config.ts",
+    "test:update": "vitest --update",
+    "typecheck": "pnpm run --r --parallel typecheck && tsc --noEmit",
+    "typecheck:propertyTypes": "pnpm run --r --parallel typecheck --exactOptionalPropertyTypes false && tsc --noEmit --exactOptionalPropertyTypes false"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.4.1",
+    "@types/node": "^20.10.5",
+    "@vitest/coverage-v8": "^1.0.4",
+    "knip": "^3.8.2",
+    "publint": "^0.2.6",
+    "rimraf": "^5.0.5",
+    "simple-git-hooks": "^2.9.0",
+    "typescript": "^5.3.3",
+    "vitest": "^1.0.4"
+  },
+  "packageManager": "pnpm@8.12.1",
+  "simple-git-hooks": {
+    "pre-commit": "pnpm format && pnpm lint:fix"
+  },
+  "knip": {
+    "ignoreDependencies": [
+      "@vitest/coverage-v8"
+    ],
+    "workspaces": {
+      ".": {
+        "entry": "scripts/*.ts"
+      },
+      "packages/ts-clarity": {
+        "entry": [
+          "src/index.ts!",
+          "**/*.bench.ts",
+          "**/*.test.ts",
+          "**/*.test-d.ts",
+          "**/vitest.*.ts"
+        ]
+      }
+    }
+  }
+}
