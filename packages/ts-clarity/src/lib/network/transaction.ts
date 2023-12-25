@@ -1,8 +1,13 @@
 import type { Transaction } from '@stacks/stacks-blockchain-api-types';
+import {
+  StacksTransaction,
+  deserializeTransaction,
+} from '@stacks/transactions';
 import { retryOnError, richFetch } from '../common/fetch.js';
 import {
   type RequestOptions,
   mergeDefaultExtendedApiRequestOptions,
+  mergeDefaultNodeApiRequestOptions,
 } from './request.js';
 
 export async function getTransaction(
@@ -24,4 +29,25 @@ export async function getTransaction(
   });
   if (rs.status === 404) return null;
   return await rs.json();
+}
+
+export async function getMempoolTransaction(
+  txid: string,
+  _options?: RequestOptions,
+): Promise<StacksTransaction | null> {
+  const options = mergeDefaultNodeApiRequestOptions(_options);
+  const url = `${options.stacksEndpoint}/v2/transactions/unconfirmed/${
+    txid.startsWith('0x') ? txid.substring(2) : txid
+  }`;
+  const rs = await richFetch(url, {
+    timeout: options.timeout,
+    fetch: options.fetch,
+    retries: options.retries,
+    retryDelay: options.retryDelay,
+    retryOn: retryOnError,
+  });
+  if (rs.status === 404) return null;
+  const { tx, status } = await rs.json();
+  if (status !== 'Mempool') return null;
+  return deserializeTransaction(Buffer.from(tx, 'hex'));
 }

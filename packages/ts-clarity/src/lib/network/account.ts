@@ -36,6 +36,12 @@ export async function getAccountInfo<T extends { proof?: boolean }>(
     retryOn: retryOnError,
   });
   const result: AccountDataResponse = await rs.json();
+  // safe-guard to ensure stacks api returns proper response
+  if (typeof result.nonce !== 'number' || !(result.nonce >= 0)) {
+    throw new Error(
+      `Unexpected account nonce response: ${JSON.stringify(result)}`,
+    );
+  }
   result.balance = BigInt(result.balance);
   result.locked = BigInt(result.locked);
   return result;
@@ -81,6 +87,15 @@ export async function getAccountNonces(
     retryOn: retryOnError,
   });
   const nonces: AddressNonces = await rs.json();
+  // safe-guard to ensure stacks api returns proper response
+  if (
+    typeof nonces.possible_next_nonce !== 'number' ||
+    !(nonces.possible_next_nonce >= 0)
+  ) {
+    throw new Error(
+      `Unexpected account nonce response: ${JSON.stringify(nonces)}`,
+    );
+  }
   if (nonces.last_executed_tx_nonce == null) nonces.last_executed_tx_nonce = -1;
   if (nonces.last_mempool_tx_nonce == null) nonces.last_mempool_tx_nonce = -1;
   if (!Array.isArray(nonces.detected_missing_nonces))
