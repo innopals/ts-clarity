@@ -11,3 +11,4 @@ export * from './lib/network/account.js';
 export * from './lib/network/info.js';
 export * from './lib/network/request.js';
 export * from './lib/network/transaction.js';
+export * from './lib/utils/buffer.js';

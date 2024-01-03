@@ -20,6 +20,7 @@ import {
   retryOnError,
   richFetch,
 } from '../common/fetch.js';
+import { fromUint8Array } from '../utils/buffer.js';
 import { decodeAbi, encodeAbi } from './abi-codec.js';
 import { kDefaultStacksEndpoint } from './constants.js';
 import type {
@@ -31,7 +32,7 @@ export type ReadonlyCallRuntimeOptions = {
   sender?: TPrincipal;
   contract: TContractPrincipal;
   stacksEndpoint?: string;
-  indexBlockHash?: HexString;
+  indexBlockHash?: HexString | Uint8Array;
 } & Omit<RequestTimeoutRetryParams, 'retryOn'>;
 
 export async function callReadonly<
@@ -45,6 +46,8 @@ export async function callReadonly<
   const urlParams = new URLSearchParams();
   if (typeof params.indexBlockHash === 'string') {
     urlParams.set('tip', params.indexBlockHash.substring(2).toLowerCase());
+  } else if (params.indexBlockHash instanceof Uint8Array) {
+    urlParams.set('tip', fromUint8Array(params.indexBlockHash).toString('hex'));
   }
 
   const [deployer, contractName] = params.contract.split('.', 2);

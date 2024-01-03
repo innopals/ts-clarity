@@ -16,6 +16,7 @@ import {
   retryOnError,
   richFetch,
 } from '../common/fetch.js';
+import { fromUint8Array } from '../utils/buffer.js';
 import { decodeAbi, encodeAbi } from './abi-codec.js';
 import { kDefaultStacksEndpoint } from './constants.js';
 import type {
@@ -27,7 +28,7 @@ export type ReadMapRuntimeParameters = {
   contract: TContractPrincipal;
   stacksEndpoint?: string;
   proof?: boolean;
-  indexBlockHash?: HexString;
+  indexBlockHash?: HexString | Uint8Array;
 } & Omit<RequestTimeoutRetryParams, 'retryOn'>;
 
 export async function readMap<
@@ -47,6 +48,8 @@ export async function readMap<
   urlParams.set('proof', proof === true ? '1' : '0');
   if (typeof indexBlockHash === 'string') {
     urlParams.set('tip', indexBlockHash.substring(2).toLowerCase());
+  } else if (indexBlockHash instanceof Uint8Array) {
+    urlParams.set('tip', fromUint8Array(indexBlockHash).toString('hex'));
   }
 
   const [deployer, contractName] = contract.split('.', 2);
