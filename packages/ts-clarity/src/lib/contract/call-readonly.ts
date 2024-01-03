@@ -95,3 +95,20 @@ export async function callReadonly<
     result,
   ) as unknown as InferReadonlyCallResultType<Functions, FunctionName>;
 }
+
+export function unwrapResponse<T>(
+  response:
+    | {
+        type: 'success';
+        value: T;
+      }
+    | {
+        type: 'error';
+        error: unknown;
+      },
+): T {
+  if (response.type === 'success') {
+    return response.value;
+  }
+  throw response.error;
+}

@@ -1,7 +1,7 @@
 import type { ClarityAbi } from 'clarity-abi';
 import { SIP010TraitABI } from 'clarity-abi/abis';
-import { assert, test } from 'vitest';
-import { callReadonly } from './call-readonly.js';
+import { assert, assertType, test } from 'vitest';
+import { callReadonly, unwrapResponse } from './call-readonly.js';
 
 test('call readonly without args', async () => {
   const rs = await callReadonly({
@@ -24,6 +24,10 @@ test('call readonly with args', async () => {
     },
   });
   console.log(rs);
+
+  const unwrapped = unwrapResponse(rs);
+  assertType<bigint>(unwrapped);
+
   assert(rs.type === 'success');
   assert(rs.value > 0n);
 });

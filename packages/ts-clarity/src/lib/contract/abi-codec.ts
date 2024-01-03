@@ -216,7 +216,7 @@ export function decodeAbi<T extends ClarityAbiType>(
     }
     return {
       type: 'error',
-      value: decodeAbi(abi.response.error, cv.value),
+      error: decodeAbi(abi.response.error, cv.value),
     } as unknown as InferClarityAbiType<T>;
   }
   if (isClarityAbiBuffer(abi)) {
