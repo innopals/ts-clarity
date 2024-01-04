@@ -1,4 +1,7 @@
-import type { Transaction } from '@stacks/stacks-blockchain-api-types';
+import type {
+  MempoolTransaction,
+  Transaction,
+} from '@stacks/stacks-blockchain-api-types';
 import {
   StacksTransaction,
   deserializeTransaction,
@@ -13,7 +16,7 @@ import {
 export async function getTransaction(
   txid: string,
   _options?: RequestOptions,
-): Promise<Transaction | null> {
+): Promise<Transaction | MempoolTransaction | null> {
   const options = mergeDefaultExtendedApiRequestOptions(_options);
   const url = `${options.stacksEndpoint}/extended/v1/tx/${
     txid.startsWith('0x') ? txid : `0x${txid}`
