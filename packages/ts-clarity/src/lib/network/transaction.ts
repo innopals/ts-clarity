@@ -12,9 +12,7 @@ import {
 
 export async function getTransaction(
   txid: string,
-  _options?: RequestOptions & {
-    unanchored?: boolean;
-  },
+  _options?: RequestOptions,
 ): Promise<Transaction | null> {
   const options = mergeDefaultExtendedApiRequestOptions(_options);
   const url = `${options.stacksEndpoint}/extended/v1/tx/${
