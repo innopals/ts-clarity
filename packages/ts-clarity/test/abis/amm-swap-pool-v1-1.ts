@@ -1,5 +1,5 @@
 /* eslint-disable */
-export default ({
+export default {
   functions: [
     {
       name: 'accumulate_division',
@@ -3332,4 +3332,4 @@ export default ({
   non_fungible_tokens: [],
   epoch: 'Epoch22',
   clarity_version: 'Clarity2',
-} as const);
+} as const;
