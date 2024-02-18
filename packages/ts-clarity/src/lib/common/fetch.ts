@@ -6,13 +6,13 @@ const kDefaultRequestTimeout = 60_000;
 
 export type RequestDelayFunction = (
   attempt: number,
-  error: Error | null,
+  error: unknown | null,
   response: Response | null,
 ) => number;
 
 export type RequestRetryOnFunction = (
   attempt: number,
-  error: Error | null,
+  error: unknown | null,
   response: Response | null,
 ) => boolean | Promise<boolean>;
 
@@ -35,11 +35,13 @@ export function exponentialBackoff(
 
 export function retryOnError(
   _attempt: number,
-  error: Error | null,
+  error: unknown | null,
   response: Response | null,
 ) {
   if (error != null) return true;
-  if (response != null && response.status >= 500) return true;
+  if (response != null) {
+    if (response.status === 429 || response.status >= 500) return true;
+  }
   return false;
 }
 
@@ -83,8 +85,8 @@ export async function richFetch(
       return response;
     } catch (e: unknown) {
       if (attempt + 1 >= retries) throw e;
-      if (await retryOn(attempt, null, response)) {
-        const delay = retryDelay(attempt, null, response);
+      if (await retryOn(attempt, e, response)) {
+        const delay = retryDelay(attempt, e, response);
         await new Promise((f) => setTimeout(f, delay));
         continue;
       }
