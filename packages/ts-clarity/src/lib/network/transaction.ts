@@ -3,7 +3,7 @@ import type {
   Transaction,
 } from '@stacks/stacks-blockchain-api-types';
 import {
-  StacksTransaction,
+  type StacksTransaction,
   deserializeTransaction,
 } from '@stacks/transactions';
 import { retryOnError, richFetch } from '../common/fetch.js';

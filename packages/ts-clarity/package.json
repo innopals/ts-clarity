@@ -35,13 +35,13 @@
     "./package.json": "./package.json"
   },
   "dependencies": {
-    "@stacks/stacks-blockchain-api-types": "^7.8.1",
-    "@stacks/transactions": "^6.11.3",
+    "@stacks/stacks-blockchain-api-types": "^7.8.2",
+    "@stacks/transactions": "^6.12.0",
     "clarity-abi": "^0.0.17",
     "cross-fetch": "^4.0.0"
   },
   "devDependencies": {
-    "typescript": "^5.3.3"
+    "typescript": "^5.4.2"
   },
   "contributors": ["bestmike007 <bestmike007@gmail.com>"],
   "keywords": ["abi", "clarity", "stacks", "typescript", "sdk", "web3"]
