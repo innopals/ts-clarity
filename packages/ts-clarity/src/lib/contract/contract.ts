@@ -8,6 +8,7 @@ import type {
   GetVariableByName,
   InferClarityAbiType,
   InferClarityAbiTypeTuple,
+  MergeUnion,
 } from 'clarity-abi';
 
 //////////////////////////////////////////////////////////////////////
@@ -32,21 +33,24 @@ export type InferFunctionName<
   : FunctionName;
 
 export type InferFunctionArgsType<
-  Functions extends
-    | readonly ClarityAbiFunction[]
-    | readonly unknown[] = readonly ClarityAbiFunction[],
-  FunctionName extends string = string,
+  Functions extends readonly ClarityAbiFunction[],
+  FunctionName extends Functions[number]['name'],
   V extends ClarityAbiFunction['access'] = 'read_only' | 'public',
-  TFunction extends
-    ClarityAbiFunction = Functions extends readonly ClarityAbiFunction[]
-    ? GetFunctionByName<Functions, FunctionName, V>
-    : ClarityAbiFunction,
-  TArgs = InferClarityAbiTypeTuple<TFunction['args']>,
+  TFunction extends ClarityAbiFunction = GetFunctionByName<
+    Functions,
+    FunctionName,
+    V
+  >,
+  TArgs extends
+    | Record<string, unknown>
+    | never = TFunction extends ClarityAbiFunction
+    ? InferClarityAbiTypeTuple<TFunction['args']>
+    : never,
 > = [TArgs] extends [never]
   ? { args?: unknown }
   : {} extends TArgs
     ? {}
-    : { args: TArgs };
+    : { args: MergeUnion<TArgs> };
 
 export type InferReadonlyCallResultType<
   Functions extends
@@ -69,7 +73,9 @@ export type InferReadonlyCallParameterType<
 > = {
   abi: Functions;
   functionName: InferFunctionName<Functions, FunctionName, 'read_only'>;
-} & InferFunctionArgsType<Functions, FunctionName, 'read_only'>;
+} & (Functions extends readonly ClarityAbiFunction[]
+  ? InferFunctionArgsType<Functions, FunctionName, 'read_only'>
+  : { args?: unknown });
 
 //////////////////////////////////////////////////////////////////////
 // Maps

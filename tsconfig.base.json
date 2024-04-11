@@ -18,6 +18,7 @@
     "verbatimModuleSyntax": true,
     "moduleResolution": "NodeNext",
     "module": "NodeNext",
+    "outDir": "dist",
     "target": "ES2021",
     "lib": ["ES2022", "DOM"],
     "skipLibCheck": true
