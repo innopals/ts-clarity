@@ -110,5 +110,5 @@ export function unwrapResponse<T>(
   if (response.type === 'success') {
     return response.value;
   }
-  throw response.error;
+  throw new Error(`Clarity ResponseErr: ${response.error}`);
 }
