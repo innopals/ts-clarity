@@ -3,6 +3,13 @@
 import fetch from 'cross-fetch';
 
 const kDefaultRequestTimeout = 60_000;
+const kResponseBodyReaders = [
+  'json',
+  'text',
+  'formData',
+  'blob',
+  'arrayBuffer',
+] as const;
 
 export type RequestDelayFunction = (
   attempt: number,
@@ -66,7 +73,8 @@ export async function richFetch(
           options.retryOn.includes(response.status);
   for (let attempt = 0; attempt < retries; attempt++) {
     const abortController = new AbortController();
-    const timer = setTimeout(
+    const requestStart = Date.now();
+    let timer: ReturnType<typeof setTimeout> | null = setTimeout(
       () => abortController.abort(`request timeout after ${timeout}ms`),
       timeout,
     );
@@ -82,6 +90,21 @@ export async function richFetch(
         await new Promise((f) => setTimeout(f, delay));
         continue;
       }
+      for (const f of kResponseBodyReaders) {
+        const fn = response[f];
+        response[f] = async (...args) => {
+          timer = setTimeout(
+            () => abortController.abort(`request timeout after ${timeout}ms`),
+            requestStart + timeout - Date.now(),
+          );
+          try {
+            return await fn.apply(response, args);
+          } finally {
+            clearTimeout(timer);
+            timer = null;
+          }
+        };
+      }
       return response;
     } catch (e: unknown) {
       if (attempt + 1 >= retries) throw e;
@@ -92,12 +115,8 @@ export async function richFetch(
       }
       throw e;
     } finally {
-      (response?.body?.getReader().closed ?? Promise.resolve())
-        .catch()
-        .then(() => {
-          clearTimeout(timer);
-          options?.signal?.removeEventListener('abort', onCancel);
-        });
+      clearTimeout(timer);
+      timer = null;
     }
   }
   // Should never reach here.
