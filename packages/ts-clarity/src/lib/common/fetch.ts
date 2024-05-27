@@ -84,7 +84,10 @@ export async function richFetch(
     }
     let response: Response | null = null;
     try {
-      response = await doFetch(url, options);
+      response = await doFetch(url, {
+        ...options,
+        signal: abortController.signal,
+      });
       if (await retryOn(attempt, null, response)) {
         const delay = retryDelay(attempt, null, response);
         await new Promise((f) => setTimeout(f, delay));

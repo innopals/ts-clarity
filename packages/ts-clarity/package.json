@@ -1,7 +1,7 @@
 {
   "name": "ts-clarity",
   "description": "TypeScript runtime SDK for Clarity ABIs on Stacks",
-  "version": "0.0.25",
+  "version": "0.0.26",
   "license": "MIT",
   "repository": "innopals/ts-clarity",
   "scripts": {
