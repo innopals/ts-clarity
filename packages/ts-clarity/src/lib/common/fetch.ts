@@ -66,7 +66,7 @@ export async function richFetch(
           options.retryOn.includes(response.status);
   for (let attempt = 0; attempt < retries; attempt++) {
     const abortController = new AbortController();
-    setTimeout(
+    const timer = setTimeout(
       () => abortController.abort(`request timeout after ${timeout}ms`),
       timeout,
     );
@@ -91,6 +91,13 @@ export async function richFetch(
         continue;
       }
       throw e;
+    } finally {
+      (response?.body?.getReader().closed ?? Promise.resolve())
+        .catch()
+        .then(() => {
+          clearTimeout(timer);
+          options?.signal?.removeEventListener('abort', onCancel);
+        });
     }
   }
   // Should never reach here.
