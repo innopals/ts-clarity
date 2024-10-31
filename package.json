@@ -9,7 +9,7 @@
     "deps": "pnpx taze -r",
     "format": "biome format . --write",
     "lint": "biome check .",
-    "lint:fix": "pnpm lint --apply",
+    "lint:fix": "pnpm lint --write",
     "lint:unused": "pnpm clean && knip",
     "prepare": "npx simple-git-hooks",
     "prepublishOnly": "tsc && node build/formatPackageJson.js",
@@ -22,17 +22,17 @@
     "typecheck:propertyTypes": "pnpm run --r --parallel typecheck --exactOptionalPropertyTypes false && tsc --noEmit --exactOptionalPropertyTypes false"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.7.3",
-    "@types/node": "^20.12.12",
-    "@vitest/coverage-v8": "^1.6.0",
-    "knip": "^5.16.0",
-    "publint": "^0.2.8",
-    "rimraf": "^5.0.7",
+    "@biomejs/biome": "1.9.4",
+    "@types/node": "^22.8.5",
+    "@vitest/coverage-v8": "^2.1.4",
+    "knip": "^5.34.4",
+    "publint": "^0.2.12",
+    "rimraf": "^6.0.1",
     "simple-git-hooks": "^2.11.1",
-    "typescript": "^5.4.5",
-    "vitest": "^1.6.0"
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.4"
   },
-  "packageManager": "pnpm@9.1.2",
+  "packageManager": "pnpm@9.12.3",
   "simple-git-hooks": {
     "pre-commit": "pnpm run lint"
   },

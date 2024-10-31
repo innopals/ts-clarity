@@ -7,7 +7,7 @@ test('call readonly without args', async () => {
   const rs = await callReadonly({
     abi: SIP010TraitABI.functions,
     functionName: 'get-total-supply',
-    contract: 'SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9.token-abtc',
+    contract: 'SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.token-alex',
   });
   console.log(rs);
   assert(rs.type === 'success');
@@ -18,9 +18,9 @@ test('call readonly with args', async () => {
   const rs = await callReadonly({
     abi: SIP010TraitABI.functions,
     functionName: 'get-balance',
-    contract: 'SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9.token-abtc',
+    contract: 'SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.token-alex',
     args: {
-      who: 'SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9',
+      who: 'SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.amm-vault-v2-01',
     },
   });
   console.log(rs);
@@ -37,7 +37,7 @@ test('call readonly with unknown ABI', async () => {
   const rs = await callReadonly({
     abi: abi.functions,
     functionName: 'get-total-supply',
-    contract: 'SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9.token-abtc',
+    contract: 'SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.token-alex',
   });
   console.log(rs);
 });

@@ -1,23 +1,23 @@
 import type { ClarityAbi } from 'clarity-abi';
 import { assert, test } from 'vitest';
-import ammSwapPoolV11 from '../../../test/abis/amm-swap-pool-v1-1.js';
+import AmmVault from '../../../test/abis/amm-vault-v2-01.js';
 import { readVariable } from './read-variable.js';
 
 test('read variable', async () => {
   const rs = await readVariable({
-    abi: ammSwapPoolV11.variables,
-    variableName: 'contract-owner',
-    contract: 'SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9.amm-swap-pool-v1-1',
+    abi: AmmVault.variables,
+    variableName: 'paused',
+    contract: 'SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.amm-vault-v2-01',
   });
-  assert(String(rs) === 'SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9');
+  assert(rs === false);
 });
 
 test('read variable with unknown ABI', async () => {
-  const abi: ClarityAbi = ammSwapPoolV11 as unknown as ClarityAbi;
+  const abi: ClarityAbi = AmmVault as unknown as ClarityAbi;
   const rs = await readVariable({
     abi: abi.variables,
-    variableName: 'contract-owner',
-    contract: 'SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9.amm-swap-pool-v1-1',
+    variableName: 'paused',
+    contract: 'SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.amm-vault-v2-01',
   });
-  assert(String(rs) === 'SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9');
+  assert(rs === false);
 });
