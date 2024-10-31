@@ -1,7 +1,9 @@
+import { cvToString } from '@stacks/transactions';
 import type { ClarityAbi } from 'clarity-abi';
 import { SIP010TraitABI } from 'clarity-abi/abis';
 import { assert, assertType, test } from 'vitest';
 import { callReadonly, unwrapResponse } from './call-readonly.js';
+import { makeFunctionArgs } from './contract.js';
 
 test('call readonly without args', async () => {
   const rs = await callReadonly({
@@ -40,4 +42,19 @@ test('call readonly with unknown ABI', async () => {
     contract: 'SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.token-alex',
   });
   console.log(rs);
+});
+
+test('make function args', async () => {
+  const args = makeFunctionArgs({
+    abi: SIP010TraitABI.functions,
+    functionName: 'burn',
+    args: {
+      amount: 0n,
+      sender: 'SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM',
+    },
+  });
+  assert(
+    args.map((cv) => cvToString(cv)).join(',') ===
+      'u0,SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM',
+  );
 });

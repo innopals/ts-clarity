@@ -1,3 +1,4 @@
+import type { ClarityValue } from '@stacks/transactions';
 import type {
   ClarityAbiFunction,
   ClarityAbiMap,
@@ -10,6 +11,8 @@ import type {
   InferClarityAbiTypeTuple,
   MergeUnion,
 } from 'clarity-abi';
+import { assert } from '../common/assert.js';
+import { encodeAbi } from './abi-codec.js';
 
 //////////////////////////////////////////////////////////////////////
 // Functions
@@ -75,6 +78,26 @@ export type InferReadonlyCallParameterType<
   functionName: InferFunctionName<Functions, FunctionName, 'read_only'>;
 } & (Functions extends readonly ClarityAbiFunction[]
   ? InferFunctionArgsType<Functions, FunctionName, 'read_only'>
+  : { args?: unknown });
+
+export type InferCallParameterType<
+  Functions extends
+    | readonly ClarityAbiFunction[]
+    | readonly unknown[] = readonly ClarityAbiFunction[],
+  FunctionName extends string = string,
+> = {
+  abi: Functions;
+  functionName: InferFunctionName<
+    Functions,
+    FunctionName,
+    'read_only' | 'public' | 'private'
+  >;
+} & (Functions extends readonly ClarityAbiFunction[]
+  ? InferFunctionArgsType<
+      Functions,
+      FunctionName,
+      'read_only' | 'public' | 'private'
+    >
   : { args?: unknown });
 
 //////////////////////////////////////////////////////////////////////
@@ -172,3 +195,22 @@ export type InferReadVariableParameterType<
   abi: Variables;
   variableName: InferVariableName<Variables, VariableName>;
 };
+
+export function makeFunctionArgs<
+  Functions extends readonly ClarityAbiFunction[] | readonly unknown[],
+  FunctionName extends string,
+>(params: InferCallParameterType<Functions, FunctionName>): ClarityValue[] {
+  const args: ClarityValue[] = [];
+  const functionDef = (params.abi as readonly ClarityAbiFunction[]).find(
+    (def) => def.name === params.functionName,
+  );
+  assert(
+    functionDef != null,
+    `failed to find function definition for ${params.functionName}`,
+  );
+  const argsKV = (params as unknown as { args: Record<string, unknown> }).args;
+  for (const argDef of functionDef.args) {
+    args.push(encodeAbi(argDef.type, argsKV[argDef.name]));
+  }
+  return args;
+}
