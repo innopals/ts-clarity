@@ -3,7 +3,7 @@ import type {
   Transaction,
 } from '@stacks/stacks-blockchain-api-types';
 import {
-  type StacksTransaction,
+  type StacksTransactionWire,
   deserializeTransaction,
 } from '@stacks/transactions';
 import { retryOnError, richFetch } from '../common/fetch.js';
@@ -35,7 +35,7 @@ export async function getTransaction(
 export async function getMempoolTransaction(
   txid: string,
   _options?: RequestOptions,
-): Promise<StacksTransaction | null> {
+): Promise<StacksTransactionWire | null> {
   const options = mergeDefaultNodeApiRequestOptions(_options);
   const url = `${options.stacksEndpoint}/v2/transactions/unconfirmed/${
     txid.startsWith('0x') ? txid.substring(2) : txid

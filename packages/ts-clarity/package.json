@@ -1,7 +1,7 @@
 {
   "name": "ts-clarity",
   "description": "TypeScript runtime SDK for Clarity ABIs on Stacks",
-  "version": "0.0.27",
+  "version": "0.1.0-pre.1",
   "license": "MIT",
   "repository": "innopals/ts-clarity",
   "scripts": {
@@ -36,8 +36,8 @@
   },
   "dependencies": {
     "@stacks/stacks-blockchain-api-types": "^7.14.1",
-    "@stacks/transactions": "^6.17.0",
-    "clarity-abi": "^0.0.20",
+    "@stacks/transactions": "^7.0.0",
+    "clarity-abi": "^0.1.0",
     "cross-fetch": "^4.0.0"
   },
   "devDependencies": {

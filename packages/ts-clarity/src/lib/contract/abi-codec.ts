@@ -1,7 +1,6 @@
 import {
   ClarityType,
   type ClarityValue,
-  addressToString,
   contractPrincipalCV,
   standardPrincipalCV,
 } from '@stacks/transactions';
@@ -18,6 +17,7 @@ import {
   isClarityAbiTuple,
 } from 'clarity-abi';
 import { assert } from '../common/assert.js';
+import { fromUint8Array } from '../utils/buffer.js';
 
 function assertNever(v: never): never {
   throw new Error(`unexpected value: ${v}`);
@@ -74,14 +74,14 @@ export function encodeAbi<T extends ClarityAbiType>(
     assert(typeof value === 'string');
     return {
       type: ClarityType.StringASCII,
-      data: value,
+      value,
     };
   }
   if (isClarityAbiStringUtf8(abi)) {
     assert(typeof value === 'string');
     return {
       type: ClarityType.StringUTF8,
-      data: value,
+      value,
     };
   }
   if (isClarityAbiTuple(abi)) {
@@ -89,11 +89,11 @@ export function encodeAbi<T extends ClarityAbiType>(
     const kv = value as Record<string, unknown>;
     const tuple: ClarityValue = {
       type: ClarityType.Tuple,
-      data: {} as Record<string, ClarityValue>,
+      value: {} as Record<string, ClarityValue>,
     };
     for (const def of abi.tuple) {
       const v = kv[def.name];
-      tuple.data[def.name] = encodeAbi(def.type, v);
+      tuple.value[def.name] = encodeAbi(def.type, v);
     }
     return tuple;
   }
@@ -118,14 +118,14 @@ export function encodeAbi<T extends ClarityAbiType>(
     assert(value instanceof Uint8Array);
     return {
       type: ClarityType.Buffer,
-      buffer: value,
+      value: fromUint8Array(value).toString('hex'),
     };
   }
   if (isClarityAbiList(abi)) {
     assert(Array.isArray(value));
     return {
       type: ClarityType.List,
-      list: value.map((item) => encodeAbi(abi.list.type, item)),
+      value: value.map((item) => encodeAbi(abi.list.type, item)),
     };
   }
   if (isClarityAbiOptional(abi)) {
@@ -170,35 +170,29 @@ export function decodeAbi<T extends ClarityAbiType>(
             cv.type === ClarityType.PrincipalContract,
         );
         if (cv.type === ClarityType.PrincipalStandard) {
-          return addressToString(
-            cv.address,
-          ) as unknown as InferClarityAbiType<T>;
+          return cv.value as unknown as InferClarityAbiType<T>;
         }
-        return `${addressToString(cv.address)}.${
-          cv.contractName.content
-        }` as unknown as InferClarityAbiType<T>;
+        return cv.value as unknown as InferClarityAbiType<T>;
       case 'trait_reference':
         assert(cv.type === ClarityType.PrincipalContract);
-        return `${addressToString(cv.address)}.${
-          cv.contractName.content
-        }` as unknown as InferClarityAbiType<T>;
+        return cv.value as unknown as InferClarityAbiType<T>;
       default:
         assertNever(abi);
     }
   }
   if (isClarityAbiStringAscii(abi)) {
     assert(cv.type === ClarityType.StringASCII);
-    return cv.data as unknown as InferClarityAbiType<T>;
+    return cv.value as unknown as InferClarityAbiType<T>;
   }
   if (isClarityAbiStringUtf8(abi)) {
     assert(cv.type === ClarityType.StringUTF8);
-    return cv.data as unknown as InferClarityAbiType<T>;
+    return cv.value as unknown as InferClarityAbiType<T>;
   }
   if (isClarityAbiTuple(abi)) {
     assert(cv.type === ClarityType.Tuple);
     const tuple: Record<string, unknown> = {};
     for (const def of abi.tuple) {
-      const v = cv.data[def.name];
+      const v = cv.value[def.name];
       assert(v != null);
       tuple[def.name] = decodeAbi(def.type, v);
     }
@@ -221,11 +215,11 @@ export function decodeAbi<T extends ClarityAbiType>(
   }
   if (isClarityAbiBuffer(abi)) {
     assert(cv.type === ClarityType.Buffer);
-    return cv.buffer as unknown as InferClarityAbiType<T>;
+    return Buffer.from(cv.value, 'hex') as unknown as InferClarityAbiType<T>;
   }
   if (isClarityAbiList(abi)) {
     assert(cv.type === ClarityType.List);
-    return cv.list.map((item) =>
+    return cv.value.map((item) =>
       decodeAbi(abi.list.type, item),
     ) as unknown as InferClarityAbiType<T>;
   }
