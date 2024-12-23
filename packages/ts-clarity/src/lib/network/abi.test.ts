@@ -1,7 +1,7 @@
 import { assert, test } from 'vitest';
 import { getContractAbi } from './abi.js';
 
-test('fetch abi', async () => {
+test('abi test', async () => {
   const abi = await getContractAbi(
     'SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9.token-abtc',
   );

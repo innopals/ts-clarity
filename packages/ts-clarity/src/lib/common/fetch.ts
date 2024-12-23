@@ -3,13 +3,6 @@
 import fetch from 'cross-fetch';
 
 const kDefaultRequestTimeout = 60_000;
-const kResponseBodyReaders = [
-  'json',
-  'text',
-  'formData',
-  'blob',
-  'arrayBuffer',
-] as const;
 
 export type RequestDelayFunction = (
   attempt: number,
@@ -52,6 +45,13 @@ export function retryOnError(
   return false;
 }
 
+function throwWithStackTrace(e: unknown) {
+  if (e instanceof Error) {
+    e.stack += `\n${new Error().stack}`;
+  }
+  throw e;
+}
+
 export async function richFetch(
   url: string | URL,
   options?: RequestInit & RequestTimeoutRetryParams,
@@ -71,11 +71,11 @@ export async function richFetch(
           Array.isArray(options?.retryOn) &&
           response != null &&
           options.retryOn.includes(response.status);
+  const timeoutError = new Error(`request timeout after ${timeout}ms`);
   for (let attempt = 0; attempt < retries; attempt++) {
     const abortController = new AbortController();
-    const requestStart = Date.now();
     let timer: ReturnType<typeof setTimeout> | null = setTimeout(
-      () => abortController.abort(`request timeout after ${timeout}ms`),
+      () => abortController.abort(timeoutError),
       timeout,
     );
     const onCancel = (e: Event) => abortController.abort(e);
@@ -93,30 +93,15 @@ export async function richFetch(
         await new Promise((f) => setTimeout(f, delay));
         continue;
       }
-      for (const f of kResponseBodyReaders) {
-        const fn = response[f];
-        response[f] = async (...args) => {
-          timer = setTimeout(
-            () => abortController.abort(`request timeout after ${timeout}ms`),
-            requestStart + timeout - Date.now(),
-          );
-          try {
-            return await fn.apply(response, args);
-          } finally {
-            clearTimeout(timer);
-            timer = null;
-          }
-        };
-      }
       return response;
     } catch (e: unknown) {
-      if (attempt + 1 >= retries) throw e;
+      if (attempt + 1 >= retries) throwWithStackTrace(e);
       if (await retryOn(attempt, e, response)) {
         const delay = retryDelay(attempt, e, response);
         await new Promise((f) => setTimeout(f, delay));
         continue;
       }
-      throw e;
+      throwWithStackTrace(e);
     } finally {
       clearTimeout(timer);
       timer = null;
