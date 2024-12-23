@@ -50,5 +50,5 @@ export async function getMempoolTransaction(
   if (rs.status === 404) return null;
   const { tx, status } = await rs.json();
   if (status !== 'Mempool') return null;
-  return deserializeTransaction(Buffer.from(tx, 'hex'));
+  return deserializeTransaction(tx);
 }

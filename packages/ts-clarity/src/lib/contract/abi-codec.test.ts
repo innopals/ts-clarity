@@ -15,16 +15,18 @@ const ABI = {
 
 test('encodeAbi', async () => {
   const rs = encodeAbi(ABI, {
-    test: Buffer.from([1, 2, 3]),
+    test: Uint8Array.from([1, 2, 3]),
   });
-  expect(rs).deep.equal(tupleCV({ test: bufferCV(Buffer.from([1, 2, 3])) }));
+  expect(rs).deep.equal(
+    tupleCV({ test: bufferCV(Uint8Array.from([1, 2, 3])) }),
+  );
 });
 
 test('decodeAbi', async () => {
   const rs = decodeAbi(
     ABI,
-    tupleCV({ test: bufferCV(Buffer.from([1, 2, 3])) }),
+    tupleCV({ test: bufferCV(Uint8Array.from([1, 2, 3])) }),
   );
-  const expected: typeof rs = { test: Buffer.from([1, 2, 3]) };
+  const expected: typeof rs = { test: Uint8Array.from([1, 2, 3]) };
   expect(rs).deep.equal(expected);
 });
