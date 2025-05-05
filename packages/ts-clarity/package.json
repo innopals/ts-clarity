@@ -1,13 +1,13 @@
 {
   "name": "ts-clarity",
   "description": "TypeScript runtime SDK for Clarity ABIs on Stacks",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "repository": "innopals/ts-clarity",
   "scripts": {
     "build": "pnpm run clean && pnpm run build:cjs && pnpm run build:esm+types",
-    "build:cjs": "tsc --project tsconfig.build.json --module commonjs --moduleResolution node10 --outDir ./dist/cjs --removeComments --verbatimModuleSyntax false && echo > ./dist/cjs/package.json '{\"type\":\"commonjs\"}'",
-    "build:esm+types": "tsc --project tsconfig.build.json --outDir ./dist/esm --declaration --declarationMap --declarationDir ./dist/types && echo > ./dist/esm/package.json '{\"type\":\"module\",\"sideEffects\":false}'",
+    "build:cjs": "tsc --project tsconfig.build.json --module commonjs --moduleResolution node10 --outDir ./dist/cjs --removeComments --verbatimModuleSyntax false --declaration --declarationMap --declarationDir ./dist/cjs/types && echo > ./dist/cjs/package.json '{\"type\":\"commonjs\"}'",
+    "build:esm+types": "tsc --project tsconfig.build.json --outDir ./dist/esm --declaration --declarationMap --declarationDir ./dist/esm/types && echo > ./dist/esm/package.json '{\"type\":\"module\",\"sideEffects\":false}'",
     "clean": "rimraf dist tsconfig.tsbuildinfo",
     "test:build": "publint --strict",
     "typecheck": "tsc --noEmit"
@@ -24,11 +24,14 @@
   "type": "module",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
-  "types": "./dist/types/index.d.ts",
-  "typings": "./dist/types/index.d.ts",
+  "types": "./dist/cjs/types/index.d.ts",
+  "typings": "./dist/cjs/types/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/types/index.d.ts",
+      "types": {
+        "import": "./dist/esm/types/index.d.ts",
+        "require": "./dist/cjs/types/index.d.ts"
+      },
       "import": "./dist/esm/index.js",
       "default": "./dist/cjs/index.js"
     },
